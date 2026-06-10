@@ -17,8 +17,10 @@ Algoritmos previstos:
 - Modelo orientado a objetos para nos e rede P2P.
 - Leitura de topologias em YAML.
 - Validacoes de conectividade, grau minimo, grau maximo, self-loops, referencias invalidas e recursos por no.
+- Algoritmos `flooding`, `informed_flooding`, `random_walk` e `informed_random_walk`.
+- Simulador de buscas por `node_id`, `resource_id`, `ttl` e `algo`.
 - Exemplos de configuracao em `examples/`.
-- Testes unitarios para loader e validacoes.
+- Testes unitarios para loader, validacoes, algoritmos e simulador.
 
 ## Estrutura do projeto
 
@@ -48,6 +50,25 @@ python -m pip install -r requirements.txt
 
 ```bash
 python -m pytest
+```
+
+## Executar uma busca via Python
+
+```python
+from src.config.loader import ConfigLoader
+from src.simulation.search_simulator import SearchSimulator
+from src.validators.network_validator import NetworkValidator
+
+config = ConfigLoader.load("examples/line.yaml")
+NetworkValidator().validate(config)
+
+simulator = SearchSimulator(config.to_network(), seed=42)
+result = simulator.run(node_id="n1", resource_id="r5", ttl=4, algo="flooding")
+
+print(result.total_messages)
+print(result.total_nodes_involved)
+print(result.resource_found)
+print(result.resource_owner)
 ```
 
 ## Entrada YAML
@@ -87,3 +108,12 @@ O carregamento e a validacao da topologia verificam:
 - Todos os nos devem possuir ao menos um recurso.
 - `num_nodes` deve corresponder ao total de nos em `resources`.
 
+## Metricas
+
+Cada busca retorna:
+
+- `total_messages`
+- `total_nodes_involved`
+- `resource_found`
+- `found`
+- `resource_owner`
