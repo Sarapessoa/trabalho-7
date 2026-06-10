@@ -24,6 +24,34 @@ Algoritmos previstos:
 - Exemplos de configuracao em `examples/`.
 - Testes unitarios para loader, validacoes, algoritmos, simulador, benchmark e graficos.
 
+## Plano do projeto
+
+- [x] Ler todos os arquivos Markdown do repositorio antes de iniciar.
+- [x] Criar a estrutura completa conforme `docs/arquitetura.md`.
+- [x] Implementar modelo orientado a objetos para nos e rede P2P.
+- [x] Implementar leitura de YAML.
+- [x] Implementar validacao de conectividade da rede.
+- [x] Implementar validacao de `min_neighbors`.
+- [x] Implementar validacao de `max_neighbors`.
+- [x] Implementar validacao de ausencia de self-loops.
+- [x] Implementar validacao de recursos em todos os nos.
+- [x] Implementar algoritmo `flooding`.
+- [x] Implementar algoritmo `informed_flooding`.
+- [x] Implementar algoritmo `random_walk`.
+- [x] Implementar algoritmo `informed_random_walk`.
+- [x] Implementar simulador de buscas.
+- [x] Implementar benchmark automatizado.
+- [x] Gerar CSV consolidado com resultados.
+- [x] Gerar tabela resumo.
+- [x] Gerar graficos comparativos.
+- [x] Criar exemplos de configuracao em `examples/`.
+- [x] Criar testes unitarios.
+- [x] Atualizar README com uso, metricas e comandos.
+- [x] Configurar checagem de tipos com `mypy`.
+- [x] Configurar entry point `p2p-search`.
+- [x] Executar testes e validacoes finais.
+- [x] Fazer commits pequenos e organizados.
+
 ## Estrutura do projeto
 
 ```text
