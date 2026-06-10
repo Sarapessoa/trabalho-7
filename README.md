@@ -19,8 +19,10 @@ Algoritmos previstos:
 - Validacoes de conectividade, grau minimo, grau maximo, self-loops, referencias invalidas e recursos por no.
 - Algoritmos `flooding`, `informed_flooding`, `random_walk` e `informed_random_walk`.
 - Simulador de buscas por `node_id`, `resource_id`, `ttl` e `algo`.
+- Benchmark automatizado com topologias linha, anel, estrela e malha aleatoria.
+- Exportacao de CSV consolidado, tabela resumo e graficos comparativos.
 - Exemplos de configuracao em `examples/`.
-- Testes unitarios para loader, validacoes, algoritmos e simulador.
+- Testes unitarios para loader, validacoes, algoritmos, simulador, benchmark e graficos.
 
 ## Estrutura do projeto
 
@@ -71,6 +73,34 @@ print(result.resource_found)
 print(result.resource_owner)
 ```
 
+## Executar pela CLI
+
+Busca em uma topologia YAML:
+
+```bash
+python -m src.cli.main search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding
+```
+
+Benchmark automatizado:
+
+```bash
+python -m src.cli.main benchmark
+```
+
+O benchmark padrao executa:
+
+- Topologias: linha, anel, estrela e malha aleatoria.
+- Tamanhos: 10, 25, 50 e 100 nos.
+- TTLs: 2, 4, 8 e 16.
+- 30 repeticoes por cenario.
+
+Arquivos gerados em `results/`:
+
+- `benchmark_results.csv`
+- `benchmark_summary.csv`
+- `success_rate_by_algorithm.png`
+- `messages_by_ttl.png`
+
 ## Entrada YAML
 
 ```yaml
@@ -95,6 +125,7 @@ Exemplos disponiveis:
 - `examples/line.yaml`
 - `examples/ring.yaml`
 - `examples/star.yaml`
+- `examples/random_mesh.yaml`
 
 ## Validacoes
 
@@ -117,3 +148,9 @@ Cada busca retorna:
 - `resource_found`
 - `found`
 - `resource_owner`
+
+O resumo do benchmark calcula:
+
+- media de `total_messages`
+- media de `total_nodes_involved`
+- `success_rate`
