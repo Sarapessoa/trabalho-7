@@ -5,10 +5,11 @@ from src.algorithms.informed_flooding import InformedFlooding
 from src.algorithms.informed_random_walk import InformedRandomWalk
 from src.algorithms.random_walk import RandomWalk
 from src.config.loader import ConfigLoader
+from src.network.network import P2PNetwork
 from src.simulation.search_simulator import SearchSimulator
 
 
-def line_network():
+def line_network() -> P2PNetwork:
     config = ConfigLoader.from_dict(
         {
             "num_nodes": 4,
@@ -92,4 +93,3 @@ def test_simulator_rejects_invalid_parameters() -> None:
         assert "node_id inexistente" in str(error)
     else:
         raise AssertionError("expected invalid node error")
-

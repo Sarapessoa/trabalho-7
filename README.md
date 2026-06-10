@@ -54,6 +54,12 @@ python -m pip install -r requirements.txt
 python -m pytest
 ```
 
+## Verificar tipagem
+
+```bash
+python -m mypy src tests
+```
+
 ## Executar uma busca via Python
 
 ```python
@@ -79,6 +85,12 @@ Busca em uma topologia YAML:
 
 ```bash
 python -m src.cli.main search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding
+```
+
+Depois de instalar o projeto, o mesmo comando tambem fica disponivel pelo entry point:
+
+```bash
+p2p-search search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding
 ```
 
 Benchmark automatizado:

@@ -162,10 +162,10 @@ def _add_sorted_edge(
     node_a: str,
     node_b: str,
 ) -> None:
-    edge = tuple(sorted((node_a, node_b)))
+    left, right = sorted((node_a, node_b))
+    edge = (left, right)
     if edge in edges:
         return
     edges.add(edge)
     degrees[node_a] += 1
     degrees[node_b] += 1
-

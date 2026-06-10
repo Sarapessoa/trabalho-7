@@ -10,12 +10,30 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.scripts]
+p2p-search = "src.cli.main:main"
+
 [project.optional-dependencies]
 dev = [
+    "mypy>=1.16",
     "pytest>=8.2",
+    "types-PyYAML>=6.0",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
 
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = [
+    "matplotlib.*",
+    "networkx.*",
+    "pandas.*",
+]
+ignore_missing_imports = true

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 import networkx as nx
 
@@ -75,7 +75,7 @@ class P2PNetwork:
     @classmethod
     def from_data(
         cls,
-        resources: dict[str, Iterable[str]],
+        resources: Mapping[str, Iterable[str]],
         edges: Iterable[tuple[str, str]],
     ) -> P2PNetwork:
         """Build a network from resource mapping and edges."""
@@ -86,4 +86,3 @@ class P2PNetwork:
         for node_a, node_b in edges:
             network.add_edge(node_a, node_b)
         return network
-
