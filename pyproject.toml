@@ -1,0 +1,21 @@
+[project]
+name = "p2p-search-simulator"
+version = "0.1.0"
+description = "Simulacao de algoritmos de busca em redes P2P nao estruturadas."
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.9",
+    "networkx>=3.3",
+    "pandas>=2.2",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
