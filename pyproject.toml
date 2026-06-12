@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 p2p-search = "src.cli.main:main"
+p2p-search-gui = "src.gui.app:main"
 
 [project.optional-dependencies]
 dev = [

@@ -21,6 +21,7 @@ Algoritmos previstos:
 - Simulador de buscas por `node_id`, `resource_id`, `ttl` e `algo`.
 - Rastro passo a passo das mensagens enviadas, do TTL restante, de retornos e de recursos encontrados.
 - Modo interativo para carregar uma rede uma vez e executar varias buscas.
+- Interface grafica interativa para carregar YAML, executar buscas e salvar rastros.
 - Benchmark automatizado com topologias linha, anel, estrela e malha aleatoria.
 - Exportacao de CSV consolidado, tabela resumo e graficos comparativos.
 - Exemplos de configuracao em `examples/`.
@@ -44,6 +45,7 @@ Algoritmos previstos:
 - [x] Implementar simulador de buscas.
 - [x] Implementar rastro detalhado de execucao das buscas.
 - [x] Implementar modo interativo para buscas repetidas.
+- [x] Implementar interface grafica interativa.
 - [x] Implementar benchmark automatizado.
 - [x] Gerar CSV consolidado com resultados.
 - [x] Gerar tabela resumo.
@@ -133,7 +135,21 @@ Carregar uma rede uma vez e executar varias buscas pelo menu:
 python -m src.cli.main interactive --config examples/line.yaml
 ```
 
-Depois de instalar o projeto, o mesmo comando tambem fica disponivel pelo entry point:
+## Executar pela interface grafica
+
+A interface grafica permite selecionar o arquivo YAML, escolher no inicial, recurso, TTL, algoritmo e seed, executar a busca e salvar o rastro em `.txt`.
+
+```bash
+python -m src.gui.app
+```
+
+Depois de instalar o projeto, tambem e possivel abrir pela entrada:
+
+```bash
+p2p-search-gui
+```
+
+A busca via CLI tambem fica disponivel pelo entry point depois de instalar o projeto:
 
 ```bash
 p2p-search search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding

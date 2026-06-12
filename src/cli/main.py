@@ -5,9 +5,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from src.algorithms import SearchResult
 from src.config.loader import ConfigLoader
 from src.experiments.benchmark import Benchmark
+from src.simulation.report import format_search_result
 from src.simulation.search_simulator import SearchSimulator
 from src.validators.network_validator import NetworkValidator
 from src.visualization.plots import generate_plots
@@ -71,22 +71,6 @@ def main() -> None:
     print(f"Tabela resumo: {summary_path}")
     print(f"Grafico de barras: {bar_path}")
     print(f"Grafico de linhas: {line_path}")
-
-
-def format_search_result(result: SearchResult) -> str:
-    """Format metrics and trace events for human inspection."""
-
-    lines = [
-        "Resultado:",
-        f"total_messages: {result.total_messages}",
-        f"total_nodes_involved: {result.total_nodes_involved}",
-        f"resource_found: {result.resource_found}",
-        f"resource_owner: {result.resource_owner}",
-        "",
-        "Passo a passo:",
-    ]
-    lines.extend(f"- {event.message}" for event in result.trace)
-    return "\n".join(lines)
 
 
 def run_interactive_menu(simulator: SearchSimulator) -> None:
