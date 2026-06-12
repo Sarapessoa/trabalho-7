@@ -21,7 +21,7 @@ Algoritmos previstos:
 - Simulador de buscas por `node_id`, `resource_id`, `ttl` e `algo`.
 - Rastro passo a passo das mensagens enviadas, do TTL restante, de retornos e de recursos encontrados.
 - Modo interativo para carregar uma rede uma vez e executar varias buscas.
-- Interface grafica interativa para carregar YAML, executar buscas e salvar rastros.
+- Interface grafica interativa para carregar YAML, visualizar a rede, animar buscas e salvar rastros.
 - Benchmark automatizado com topologias linha, anel, estrela e malha aleatoria.
 - Exportacao de CSV consolidado, tabela resumo e graficos comparativos.
 - Exemplos de configuracao em `examples/`.
@@ -137,7 +137,7 @@ python -m src.cli.main interactive --config examples/line.yaml
 
 ## Executar pela interface grafica
 
-A interface grafica permite selecionar o arquivo YAML, escolher no inicial, recurso, TTL, algoritmo e seed, executar a busca e salvar o rastro em `.txt`.
+A interface grafica permite selecionar o arquivo YAML, visualizar a rede P2P validada, escolher no inicial, recurso, TTL, algoritmo e seed, executar a busca, animar as mensagens trocadas e salvar o rastro em `.txt`.
 
 ```bash
 python -m src.gui.app
@@ -148,6 +148,15 @@ Depois de instalar o projeto, tambem e possivel abrir pela entrada:
 ```bash
 p2p-search-gui
 ```
+
+Na visualizacao:
+
+- nos brancos ainda nao foram visitados;
+- nos azuis foram envolvidos na busca;
+- no verde encontrou o recurso;
+- nos alaranjados pararam com TTL 0;
+- arestas vermelhas indicam mensagens enviadas;
+- arestas roxas indicam retorno/backtracking da busca aleatoria.
 
 A busca via CLI tambem fica disponivel pelo entry point depois de instalar o projeto:
 
