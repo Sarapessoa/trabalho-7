@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 
-from src.algorithms import SearchResult
+from src.algorithms import SearchResult, TraceEvent
 from src.network.network import P2PNetwork
 
 
@@ -19,40 +19,94 @@ class RandomWalk:
     def search(self, network: P2PNetwork, node_id: str, resource_id: str, ttl: int) -> SearchResult:
         """Run a random walk from a source node."""
 
-        current = node_id
-        previous: str | None = None
-        involved: set[str] = {current}
+        involved: set[str] = {node_id}
         total_messages = 0
+        resource_owner: str | None = None
+        trace: list[TraceEvent] = []
 
-        for _ in range(ttl + 1):
+        def walk(current: str, remaining_ttl: int, path: tuple[str, ...]) -> bool:
+            nonlocal resource_owner, total_messages
+
+            trace.append(
+                TraceEvent(
+                    event="visit",
+                    node_id=current,
+                    ttl=remaining_ttl,
+                    message=f"{current} visitou a busca por {resource_id} com TTL {remaining_ttl}",
+                )
+            )
             if network.get_node(current).has_resource(resource_id):
-                return SearchResult(
-                    total_messages=total_messages,
-                    total_nodes_involved=len(involved),
-                    resource_found=True,
-                    found=True,
-                    resource_owner=current,
+                resource_owner = current
+                trace.append(
+                    TraceEvent(
+                        event="found",
+                        node_id=current,
+                        ttl=remaining_ttl,
+                        message=f"{current} encontrou o recurso {resource_id} com TTL {remaining_ttl}",
+                    )
+                )
+                return True
+
+            if remaining_ttl == 0:
+                trace.append(
+                    TraceEvent(
+                        event="ttl_expired",
+                        node_id=current,
+                        ttl=remaining_ttl,
+                        message=f"{current} parou porque o TTL chegou a 0",
+                    )
+                )
+                return False
+
+            candidates = [neighbor for neighbor in network.neighbors(current) if neighbor not in path]
+            self._rng.shuffle(candidates)
+            if not candidates:
+                trace.append(
+                    TraceEvent(
+                        event="dead_end",
+                        node_id=current,
+                        ttl=remaining_ttl,
+                        message=f"{current} nao possui vizinhos novos para tentar",
+                    )
+                )
+                return False
+
+            for neighbor in candidates:
+                next_ttl = remaining_ttl - 1
+                total_messages += 1
+                involved.add(neighbor)
+                trace.append(
+                    TraceEvent(
+                        event="send",
+                        node_id=current,
+                        ttl=remaining_ttl,
+                        from_node=current,
+                        to_node=neighbor,
+                        message=f"{current} escolheu {neighbor}; TTL {remaining_ttl} -> {next_ttl}",
+                    )
+                )
+                if walk(neighbor, next_ttl, (*path, neighbor)):
+                    return True
+                trace.append(
+                    TraceEvent(
+                        event="backtrack",
+                        node_id=current,
+                        ttl=remaining_ttl,
+                        from_node=neighbor,
+                        to_node=current,
+                        message=f"{neighbor} voltou para {current}; {current} tentara outro vizinho se existir",
+                    )
                 )
 
-            if total_messages >= ttl:
-                break
+            return False
 
-            candidates = [neighbor for neighbor in network.neighbors(current) if neighbor != previous]
-            if not candidates:
-                candidates = network.neighbors(current)
-            if not candidates:
-                break
-
-            previous = current
-            current = self._rng.choice(candidates)
-            involved.add(current)
-            total_messages += 1
-
+        walk(node_id, ttl, (node_id,))
+        found = resource_owner is not None
         return SearchResult(
             total_messages=total_messages,
             total_nodes_involved=len(involved),
-            resource_found=False,
-            found=False,
-            resource_owner=None,
+            resource_found=found,
+            found=found,
+            resource_owner=resource_owner,
+            trace=tuple(trace),
         )
-

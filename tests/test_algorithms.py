@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+
 from src.algorithms.flooding import Flooding
 from src.algorithms.informed_flooding import InformedFlooding
 from src.algorithms.informed_random_walk import InformedRandomWalk
@@ -27,6 +29,32 @@ def line_network() -> P2PNetwork:
     return config.to_network()
 
 
+def branching_network() -> P2PNetwork:
+    config = ConfigLoader.from_dict(
+        {
+            "num_nodes": 6,
+            "min_neighbors": 1,
+            "max_neighbors": 3,
+            "resources": {
+                "n1": ["r1"],
+                "n2": ["r2"],
+                "n3": ["target"],
+                "n4": ["r4"],
+                "n5": ["r5"],
+                "n6": ["r6"],
+            },
+            "edges": [
+                ["n1", "n2"],
+                ["n1", "n3"],
+                ["n1", "n4"],
+                ["n2", "n5"],
+                ["n4", "n6"],
+            ],
+        }
+    )
+    return config.to_network()
+
+
 def test_flooding_finds_resource_within_ttl() -> None:
     result = Flooding().search(line_network(), "n1", "r4", ttl=3)
 
@@ -35,6 +63,7 @@ def test_flooding_finds_resource_within_ttl() -> None:
     assert result.resource_owner == "n4"
     assert result.total_messages == 3
     assert result.total_nodes_involved == 4
+    assert any(event.event == "found" and event.node_id == "n4" for event in result.trace)
 
 
 def test_flooding_fails_when_ttl_is_too_small() -> None:
@@ -42,6 +71,23 @@ def test_flooding_fails_when_ttl_is_too_small() -> None:
 
     assert result.resource_found is False
     assert result.resource_owner is None
+
+
+def test_flooding_continues_other_branches_after_resource_is_found() -> None:
+    result = Flooding().search(branching_network(), "n1", "target", ttl=2)
+
+    assert result.resource_found is True
+    assert result.resource_owner == "n3"
+    assert any(event.event == "found" and event.node_id == "n3" for event in result.trace)
+    assert any(event.event == "send" and event.to_node == "n6" for event in result.trace)
+    assert result.total_messages == 5
+
+
+def test_flooding_ttl_one_stops_at_first_layer() -> None:
+    result = Flooding().search(branching_network(), "n1", "r5", ttl=1)
+
+    assert result.resource_found is False
+    assert {event.to_node for event in result.trace if event.event == "send"} == {"n2", "n3", "n4"}
 
 
 def test_random_walk_is_reproducible_with_seeded_rng() -> None:
@@ -59,6 +105,15 @@ def test_random_walk_finds_resource_on_line() -> None:
 
     assert result.resource_found is True
     assert result.resource_owner == "n4"
+
+
+def test_random_walk_backtracks_and_finds_resource_within_ttl() -> None:
+    for seed in range(10):
+        result = RandomWalk(random.Random(seed)).search(branching_network(), "n1", "target", ttl=1)
+
+        assert result.resource_found is True
+        assert result.resource_owner == "n3"
+        assert result.total_messages >= 1
 
 
 def test_informed_flooding_uses_cache_after_learning() -> None:

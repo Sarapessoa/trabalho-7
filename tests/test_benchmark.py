@@ -28,6 +28,7 @@ def test_benchmark_returns_expected_rows() -> None:
         "informed_random_walk",
     }
     assert {"total_messages", "total_nodes_involved", "resource_found"}.issubset(results.columns)
+    assert "trace" not in results.columns
 
 
 def test_benchmark_saves_csv_and_plots(tmp_path: Path) -> None:
@@ -47,4 +48,3 @@ def test_random_mesh_example_is_valid() -> None:
     config = ConfigLoader.load("examples/random_mesh.yaml")
 
     NetworkValidator().validate(config)
-

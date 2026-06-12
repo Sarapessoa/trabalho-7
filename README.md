@@ -19,6 +19,8 @@ Algoritmos previstos:
 - Validacoes de conectividade, grau minimo, grau maximo, self-loops, referencias invalidas e recursos por no.
 - Algoritmos `flooding`, `informed_flooding`, `random_walk` e `informed_random_walk`.
 - Simulador de buscas por `node_id`, `resource_id`, `ttl` e `algo`.
+- Rastro passo a passo das mensagens enviadas, do TTL restante, de retornos e de recursos encontrados.
+- Modo interativo para carregar uma rede uma vez e executar varias buscas.
 - Benchmark automatizado com topologias linha, anel, estrela e malha aleatoria.
 - Exportacao de CSV consolidado, tabela resumo e graficos comparativos.
 - Exemplos de configuracao em `examples/`.
@@ -40,6 +42,8 @@ Algoritmos previstos:
 - [x] Implementar algoritmo `random_walk`.
 - [x] Implementar algoritmo `informed_random_walk`.
 - [x] Implementar simulador de buscas.
+- [x] Implementar rastro detalhado de execucao das buscas.
+- [x] Implementar modo interativo para buscas repetidas.
 - [x] Implementar benchmark automatizado.
 - [x] Gerar CSV consolidado com resultados.
 - [x] Gerar tabela resumo.
@@ -105,6 +109,8 @@ print(result.total_messages)
 print(result.total_nodes_involved)
 print(result.resource_found)
 print(result.resource_owner)
+for event in result.trace:
+    print(event.message)
 ```
 
 ## Executar pela CLI
@@ -113,6 +119,18 @@ Busca em uma topologia YAML:
 
 ```bash
 python -m src.cli.main search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding
+```
+
+Salvar o passo a passo em arquivo:
+
+```bash
+python -m src.cli.main search --config examples/line.yaml --node-id n1 --resource-id r5 --ttl 4 --algo flooding --trace-output results/rastro.txt
+```
+
+Carregar uma rede uma vez e executar varias buscas pelo menu:
+
+```bash
+python -m src.cli.main interactive --config examples/line.yaml
 ```
 
 Depois de instalar o projeto, o mesmo comando tambem fica disponivel pelo entry point:
@@ -188,6 +206,17 @@ Cada busca retorna:
 - `resource_found`
 - `found`
 - `resource_owner`
+- `trace`
+
+## Semantica das buscas
+
+O `ttl` representa a profundidade maxima da busca.
+
+No `flooding`, cada no repassa a consulta para todos os vizinhos validos enquanto ainda houver TTL. Se um ramo encontra o recurso, os outros ramos continuam executando ate o TTL acabar, simulando entidades independentes que nao recebem uma notificacao global de parada.
+
+No `random_walk`, a busca escolhe um vizinho por vez em ordem aleatoria. Quando um caminho acaba ou atinge TTL 0 sem encontrar o recurso, a busca volta para o no anterior e tenta outro vizinho ainda nao explorado. Assim, se o recurso estiver dentro da profundidade permitida, a busca consegue encontra-lo; a aleatoriedade afeta a ordem das tentativas e a quantidade de mensagens.
+
+As versoes `informed_flooding` e `informed_random_walk` mantem uma cache simples de recursos aprendidos para priorizar caminhos conhecidos quando possivel.
 
 O resumo do benchmark calcula:
 

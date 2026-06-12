@@ -9,6 +9,18 @@ from src.network.network import P2PNetwork
 
 
 @dataclass(frozen=True)
+class TraceEvent:
+    """One observable step performed during a search."""
+
+    event: str
+    node_id: str
+    ttl: int
+    message: str
+    from_node: str | None = None
+    to_node: str | None = None
+
+
+@dataclass(frozen=True)
 class SearchResult:
     """Metrics collected from one search execution."""
 
@@ -17,6 +29,7 @@ class SearchResult:
     resource_found: bool
     found: bool
     resource_owner: str | None
+    trace: tuple[TraceEvent, ...] = ()
 
 
 class SearchAlgorithm(Protocol):
@@ -26,4 +39,3 @@ class SearchAlgorithm(Protocol):
 
     def search(self, network: P2PNetwork, node_id: str, resource_id: str, ttl: int) -> SearchResult:
         """Execute a resource search from a starting node."""
-

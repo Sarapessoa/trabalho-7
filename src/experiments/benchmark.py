@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from pathlib import Path
 import random
 
@@ -66,7 +65,11 @@ class Benchmark:
                                     "ttl": ttl,
                                     "repetition": repetition + 1,
                                     "algorithm": algorithm,
-                                    **asdict(result),
+                                    "total_messages": result.total_messages,
+                                    "total_nodes_involved": result.total_nodes_involved,
+                                    "resource_found": result.resource_found,
+                                    "found": result.found,
+                                    "resource_owner": result.resource_owner,
                                 }
                             )
 

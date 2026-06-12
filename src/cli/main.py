@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from src.algorithms import SearchResult
 from src.config.loader import ConfigLoader
 from src.experiments.benchmark import Benchmark
 from src.simulation.search_simulator import SearchSimulator
@@ -25,6 +26,11 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--ttl", required=True, type=int, help="TTL da busca.")
     search.add_argument("--algo", required=True, help="Algoritmo de busca.")
     search.add_argument("--seed", type=int, default=42, help="Semente para reprodutibilidade.")
+    search.add_argument("--trace-output", help="Arquivo para salvar o passo a passo da busca.")
+
+    interactive = subparsers.add_parser("interactive", help="Carrega uma topologia e abre um menu de buscas.")
+    interactive.add_argument("--config", required=True, help="Arquivo YAML da topologia.")
+    interactive.add_argument("--seed", type=int, default=42, help="Semente para reprodutibilidade.")
 
     benchmark = subparsers.add_parser("benchmark", help="Executa o benchmark automatizado.")
     benchmark.add_argument("--output-dir", default="results", help="Diretorio de saida.")
@@ -44,7 +50,17 @@ def main() -> None:
         NetworkValidator().validate(config)
         simulator = SearchSimulator(config.to_network(), seed=args.seed)
         result = simulator.run(args.node_id, args.resource_id, args.ttl, args.algo)
-        print(result)
+        output = format_search_result(result)
+        print(output)
+        if args.trace_output:
+            Path(args.trace_output).write_text(output + "\n", encoding="utf-8")
+        return
+
+    if args.command == "interactive":
+        config = ConfigLoader.load(args.config)
+        NetworkValidator().validate(config)
+        simulator = SearchSimulator(config.to_network(), seed=args.seed)
+        run_interactive_menu(simulator)
         return
 
     benchmark = Benchmark(seed=args.seed)
@@ -57,6 +73,49 @@ def main() -> None:
     print(f"Grafico de linhas: {line_path}")
 
 
+def format_search_result(result: SearchResult) -> str:
+    """Format metrics and trace events for human inspection."""
+
+    lines = [
+        "Resultado:",
+        f"total_messages: {result.total_messages}",
+        f"total_nodes_involved: {result.total_nodes_involved}",
+        f"resource_found: {result.resource_found}",
+        f"resource_owner: {result.resource_owner}",
+        "",
+        "Passo a passo:",
+    ]
+    lines.extend(f"- {event.message}" for event in result.trace)
+    return "\n".join(lines)
+
+
+def run_interactive_menu(simulator: SearchSimulator) -> None:
+    """Run repeated searches over an already loaded network."""
+
+    print("Rede carregada. Digite 'sair' no node_id para encerrar.")
+    print(f"Algoritmos disponiveis: {', '.join(simulator.algorithms)}")
+    while True:
+        node_id = input("node_id: ").strip()
+        if node_id.lower() in {"sair", "exit", "q"}:
+            return
+        resource_id = input("resource_id: ").strip()
+        ttl_text = input("ttl: ").strip()
+        algo = input("algo: ").strip()
+        output_path = input("arquivo de rastro opcional: ").strip()
+
+        try:
+            ttl = int(ttl_text)
+            result = simulator.run(node_id=node_id, resource_id=resource_id, ttl=ttl, algo=algo)
+        except ValueError as error:
+            print(f"Erro: {error}")
+            continue
+
+        output = format_search_result(result)
+        print(output)
+        if output_path:
+            Path(output_path).write_text(output + "\n", encoding="utf-8")
+            print(f"Rastro salvo em: {output_path}")
+
+
 if __name__ == "__main__":
     main()
-
