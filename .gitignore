@@ -7,3 +7,5 @@ results/*.csv
 results/*.png
 results/*.pdf
 results/*.svg
+AGENTS.md
+docs/
