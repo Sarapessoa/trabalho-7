@@ -7,5 +7,8 @@ results/*.csv
 results/*.png
 results/*.pdf
 results/*.svg
+!results/benchmark_summary.csv
+!results/success_rate_by_algorithm.png
+!results/messages_by_ttl.png
 AGENTS.md
 docs/
